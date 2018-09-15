@@ -2,6 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using CustomerService.Dialogs;
+using CustomerService.Models;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 
@@ -18,7 +20,7 @@ namespace CustomerService
         {
             if (activity.GetActivityType() == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => Dialogs.MainDialog.dialog);
+                await Conversation.SendAsync(activity, MakeLuisDialog);
             }
             else
             {
@@ -26,6 +28,12 @@ namespace CustomerService
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
+        }
+
+
+        internal static IDialog<BugReport> MakeLuisDialog()
+        {
+            return Chain.From(() => new LUISDialog(BugReport.BuildForm)); 
         }
 
         private Activity HandleSystemMessage(Activity message)
